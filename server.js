@@ -4,6 +4,13 @@ const app = express()
 //port
 const PORT = 3001
 
+//middlewares
+app.use('/public', express.static('public'))
+
+//view engines
+app.set('views', './views')
+app.set('view engine', 'ejs')
+
 //routes
 app.get('/movies', (req, res) => {
   res.send('Bientot des films ici meme')
@@ -16,7 +23,8 @@ app.get('/movies/:id', (req, res) => {
   res.send(`film numéro ${id}`)
 })
 app.get('/', (req, res) => {
-  res.send('Hello Word !!!')
+  //res.send('Hello <b>Word<b/> !!!')
+  res.render('index')
 })
 
 //listenning
