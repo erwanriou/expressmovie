@@ -6,10 +6,15 @@
     <link rel="stylesheet" href="../public/style.css">
   </head>
   <body>
-    <% include ./partials/header %>
-    <h1>Voici la page des movies</h1>
-    <div>
-      Faite vous arnaquer comme un amateur par cette fausse page de movies mouhaahahaha
+    <div class="central">
+      <% include ./partials/header %>
+      <h1>Voici la page des movies</h1>
+      <div>
+        <p><%= title %></p>
+        <ul><% movies.map( movie => { %>
+          <div><%= movie.title %> (<%= movie.year %>)</div>
+        <% }) %></ul>
+      </div>
     </div>
     <% include ./partials/footer %>
   </body>
