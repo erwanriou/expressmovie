@@ -15,16 +15,12 @@ app.set('view engine', 'ejs')
 app.get('/movies', (req, res) => {
   res.render('movies')
 })
-app.get('/movies-details', (req, res) => {
-  res.render('movies-details')
-})
 app.get('/movies/add', (req, res) => {
   res.send('Ajouter des films ici même')
 })
 app.get('/movies/:id', (req, res) => {
   const id = req.params.id
-  //res.send(`film numéro ${id}`)
-  res.render('movies-details')
+  res.render('movies-details', { movieId: id })
 })
 app.get('/', (req, res) => {
   //res.send('Hello <b>Word<b/> !!!')
