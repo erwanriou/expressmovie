@@ -1,5 +1,6 @@
 const express = require('express')
 const bodyParser = require('body-parser')
+const multer = require('multer')
 const app = express()
 
 //Database
@@ -11,6 +12,7 @@ const PORT = 3001
 //middlewares
 app.use('/public', express.static('public'))
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
+const upload = multer()
 
 //view engines
 app.set('views', './views')
@@ -28,13 +30,16 @@ app.get('/movies', (req, res) => {
   res.render('movies', { movies: frenchMovies, title: title })
 })
 
-app.post('/movies', urlencodedParser, (req, res) => {
-  console.log('le titre: ', req.body.movieTitle)
-  console.log('l\'année: ', req.body.movieYear)
-  const newMovies = { title : req.body.movieTitle, year: req.body.movieYear}
-  frenchMovies = [...frenchMovies, newMovies]
-  console.log(frenchMovies);
-  res.sendStatus(201)
+app.post('/movies', upload.fields([]), (req, res) => {
+  if (!req.body) {
+    return res.sendStatus(500)
+  } else {
+    const formData = req.body
+    console.log('formData: ', formData)
+    const newMovies = { title : req.body.movieTitle, year: req.body.movieYear}
+    frenchMovies = [...frenchMovies, newMovies]
+    res.sendStatus(201)
+  }
 })
 app.get('/movies/add', (req, res) => {
   res.send('Ajouter des films ici même')
