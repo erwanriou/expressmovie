@@ -2,6 +2,9 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
 
+//Database
+let frenchMovies = []
+
 //port
 const PORT = 3001
 
@@ -16,7 +19,7 @@ app.set('view engine', 'ejs')
 //routes
 app.get('/movies', (req, res) => {
   const title = 'Films français des trente dernières annés'
-  const frenchMovies = [
+  frenchMovies = [
     { title: 'Le fabuleux destin d\'Amélie Poulain', year: 2001},
     { title: 'Buffet froid', year: 1979},
     { title: 'Le diner de cons', year: 1998},
@@ -26,7 +29,11 @@ app.get('/movies', (req, res) => {
 })
 
 app.post('/movies', urlencodedParser, (req, res) => {
-  console.log(req.body);
+  console.log('le titre: ', req.body.movieTitle)
+  console.log('l\'année: ', req.body.movieYear)
+  const newMovies = { title : req.body.movieTitle, year: req.body.movieYear}
+  frenchMovies = [...frenchMovies, newMovies]
+  console.log(frenchMovies);
   res.sendStatus(201)
 })
 app.get('/movies/add', (req, res) => {
