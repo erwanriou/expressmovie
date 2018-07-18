@@ -1,4 +1,5 @@
 const express = require('express')
+const bodyParser = require('body-parser')
 const app = express()
 
 //port
@@ -6,6 +7,7 @@ const PORT = 3001
 
 //middlewares
 app.use('/public', express.static('public'))
+const urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 //view engines
 app.set('views', './views')
@@ -21,6 +23,11 @@ app.get('/movies', (req, res) => {
     { title: 'De rouille et d\'os', year: 2012},
   ]
   res.render('movies', { movies: frenchMovies, title: title })
+})
+
+app.post('/movies', urlencodedParser, (req, res) => {
+  console.log(req.body);
+  res.sendStatus(201)
 })
 app.get('/movies/add', (req, res) => {
   res.send('Ajouter des films ici même')
