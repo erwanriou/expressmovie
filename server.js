@@ -44,6 +44,9 @@ app.post('/movies', upload.fields([]), (req, res) => {
 app.get('/movies/add', (req, res) => {
   res.send('Ajouter des films ici même')
 })
+app.get('/movies-search', (req, res) => {
+  res.render('movies-search')
+})
 app.get('/movies/:id', (req, res) => {
   const id = req.params.id
   res.render('movies-details', { movieId: id })
