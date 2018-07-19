@@ -2,7 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const multer = require('multer')
 const app = express()
-
+const jwt = require('jsonwebtoken')
 //Database
 let frenchMovies = []
 
@@ -13,6 +13,8 @@ const PORT = 3001
 app.use('/public', express.static('public'))
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const upload = multer()
+const fakeUser = { email: 'testuser@testemail.fr', password: 'qwe'}
+const secret = 'qwr1ewwvw15f1Aas1s24f65q1qwc1E3g15RRq1s2d165qw8r744q4asV18ff1q84Sca1a5sHH4q4gc1Vnfd87'
 
 //view engines
 app.set('views', './views')
@@ -46,6 +48,23 @@ app.get('/movies/add', (req, res) => {
 })
 app.get('/movies-search', (req, res) => {
   res.render('movies-search')
+})
+app.get('/login', (req, res) => {
+  res.render('login', { title: 'Connexion'})
+})
+app.post('/login', urlencodedParser, (req, res) => {
+  console.log('login post', req.body)
+  if(!req.body) {
+    res.sendStatus(500)
+  } else {
+    if( fakeUser.email === req.body.email &&
+        fakeUser.password === req.body.password ) {
+      const token = jwt.sign({iss: 'http://expressmovies.fr', user: 'Sam', role: 'moderator'}, secret)
+      res.json(token)
+    } else {
+      res.sendStatus(401)
+    }
+  }
 })
 app.get('/movies/:id', (req, res) => {
   const id = req.params.id
