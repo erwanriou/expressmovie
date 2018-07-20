@@ -5,8 +5,9 @@ const app = express()
 const jwt = require('jsonwebtoken')
 const expressJwt = require('express-jwt')
 const mongoose = require('mongoose');
+const faker = require('faker');
 
-//Database
+//Database Connect
 const dbUser = 'erwan'
 const dbPass = '17401985illidan'
 const dbUrl = `mongodb://${dbUser}:${dbPass}@ds245661.mlab.com:45661/expressmovie`
@@ -21,9 +22,28 @@ db.once('open', () => {
   console.log('connected to the DB')
 })
 
-let frenchMovies = []
+//Database
+const movieSchema = mongoose.Schema({
+  movieTitle: String,
+  movieYear: Number,
+})
+const Movie = mongoose.model('Movie', movieSchema)
+
+//TERMINATOR
+const title = faker.lorem.sentence(3)
+const year = Math.floor(Math.random() * 80) + 1950
+const myMovie = new Movie({movieTitle: title, movieYear: year})
+myMovie.save((err, savedMovie) => {
+  if (err) {
+    console.error(err);
+  } else {
+    console.log('savedMovie', savedMovie);
+  }
+})
+
 //port
 const PORT = 3001
+let frenchMovies = []
 
 //middlewares
 app.use('/public', express.static('public'))
