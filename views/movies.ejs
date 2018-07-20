@@ -12,7 +12,7 @@
       <div>
         <p><%= title %></p>
         <ul class="frenchMovies"><% movies.map( movie => { %>
-          <div><%= movie.movieTitle %> (<%= movie.movieYear %>)</div>
+          <a href="/movies-details/<%= movie._id %>"><div><%= movie.movieTitle %> (<%= movie.movieYear %>)</div></a>
         <% }) %></ul>
       </div>
       <br>
