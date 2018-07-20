@@ -7,8 +7,21 @@ const expressJwt = require('express-jwt')
 const mongoose = require('mongoose');
 
 //Database
-let frenchMovies = []
+const dbUser = 'erwan'
+const dbPass = '17401985illidan'
+const dbUrl = `mongodb://${dbUser}:${dbPass}@ds245661.mlab.com:45661/expressmovie`
+const options = {
+  useNewUrlParser: true,
+}
 
+mongoose.connect(dbUrl, options)
+const db = mongoose.connection
+db.on('error', console.error.bind(console, 'connection error: cannot connect to my DB'))
+db.once('open', () => {
+  console.log('connected to the DB')
+})
+
+let frenchMovies = []
 //port
 const PORT = 3001
 
