@@ -35,7 +35,18 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const upload = multer()
 const fakeUser = { email: 'testuser@testemail.fr', password: 'qwe'}
 const secret = 'qwr1ewwvw15f1Aas1s24f65q1qwc1E3g15RRq1s2d165qw8r744q4asV18ff1q84Sca1a5sHH4q4gc1Vnfd87'
-app.use(expressJwt({ secret: secret }).unless({ path: ['/login', '/movies', '/movies-search', '/']} ))
+app.use(
+  expressJwt(
+    { secret: secret }).unless(
+      { path: [
+        '/',
+        '/login',
+        '/movies',
+        '/movies-search',
+        new RegExp('/movies.*/', 'i'),]
+      }
+    )
+  )
 
 //view engines
 app.set('views', './views')
@@ -102,6 +113,22 @@ app.post('/login', urlencodedParser, (req, res) => {
 app.get('/movies/:id', (req, res) => {
   const id = req.params.id
   res.render('movies-details', { movieId: id })
+})
+app.put('/movies/:id', urlencodedParser, (req, res) => {
+  const id = req.params.id
+  if (!req.body) {
+    return res.sendStatus(500)
+  }
+  console.log('movieTitle:', req.body.movieTitle, 'movieYear: ', req.body.movieYear)
+  Movie.findByIdAndUpdate(id, {$set: {
+    movieTitle: req.body.movieTitle,
+    movieYear: req.body.movieYear,
+  }}, { new: true }, (err, movie) => {
+    if (err) {
+      console.error(err)
+      return res.send('le film n\'a pas pu etre mis a jour')
+    }
+  })
 })
 app.get('/', (req, res) => {
   //res.send('Hello <b>Word<b/> !!!')
