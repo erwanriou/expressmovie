@@ -3,6 +3,9 @@ const bodyParser = require('body-parser')
 const multer = require('multer')
 const app = express()
 const jwt = require('jsonwebtoken')
+const expressJwt = require('express-jwt')
+const mongoose = require('mongoose');
+
 //Database
 let frenchMovies = []
 
@@ -15,6 +18,7 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const upload = multer()
 const fakeUser = { email: 'testuser@testemail.fr', password: 'qwe'}
 const secret = 'qwr1ewwvw15f1Aas1s24f65q1qwc1E3g15RRq1s2d165qw8r744q4asV18ff1q84Sca1a5sHH4q4gc1Vnfd87'
+app.use(expressJwt({ secret: secret }).unless({ path: ['/login', '/movies', '/movies-search']} ))
 
 //view engines
 app.set('views', './views')
@@ -74,7 +78,10 @@ app.get('/', (req, res) => {
   //res.send('Hello <b>Word<b/> !!!')
   res.render('index')
 })
-
+app.get('/member-only', (req, res) => {
+  console.log(('req.user', req.user))
+  res.send(req.user)
+})
 //listenning
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`)
