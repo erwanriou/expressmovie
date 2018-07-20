@@ -1,21 +1,17 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const multer = require('multer')
-const app = express()
 const jwt = require('jsonwebtoken')
 const expressJwt = require('express-jwt')
 const mongoose = require('mongoose');
 const faker = require('faker');
 
-//Database Connect
-const dbUser = 'erwan'
-const dbPass = '17401985illidan'
-const dbUrl = `mongodb://${dbUser}:${dbPass}@ds245661.mlab.com:45661/expressmovie`
-const options = {
-  useNewUrlParser: true,
-}
+const config = require('./config');
 
-mongoose.connect(dbUrl, options)
+const app = express()
+
+//Database Connect
+mongoose.connect(config.db.url(), config.db.options)
 const db = mongoose.connection
 db.on('error', console.error.bind(console, 'connection error: cannot connect to my DB'))
 db.once('open', () => {
@@ -29,18 +25,6 @@ const movieSchema = mongoose.Schema({
 })
 const Movie = mongoose.model('Movie', movieSchema)
 
-//TERMINATOR
-const title = faker.lorem.sentence(3)
-const year = Math.floor(Math.random() * 80) + 1950
-const myMovie = new Movie({movieTitle: title, movieYear: year})
-myMovie.save((err, savedMovie) => {
-  if (err) {
-    console.error(err);
-  } else {
-    console.log('savedMovie', savedMovie);
-  }
-})
-
 //port
 const PORT = 3001
 let frenchMovies = []
@@ -51,7 +35,7 @@ const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const upload = multer()
 const fakeUser = { email: 'testuser@testemail.fr', password: 'qwe'}
 const secret = 'qwr1ewwvw15f1Aas1s24f65q1qwc1E3g15RRq1s2d165qw8r744q4asV18ff1q84Sca1a5sHH4q4gc1Vnfd87'
-app.use(expressJwt({ secret: secret }).unless({ path: ['/login', '/movies', '/movies-search']} ))
+app.use(expressJwt({ secret: secret }).unless({ path: ['/login', '/movies', '/movies-search', '/']} ))
 
 //view engines
 app.set('views', './views')
@@ -60,13 +44,17 @@ app.set('view engine', 'ejs')
 //routes
 app.get('/movies', (req, res) => {
   const title = 'Films français des trente dernières annés'
-  frenchMovies = [
-    { title: 'Le fabuleux destin d\'Amélie Poulain', year: 2001},
-    { title: 'Buffet froid', year: 1979},
-    { title: 'Le diner de cons', year: 1998},
-    { title: 'De rouille et d\'os', year: 2012},
-  ]
-  res.render('movies', { movies: frenchMovies, title: title })
+  Movie.find((err, movies) => {
+    if (err) {
+      console.error('couldn\'t retreive the movies from DB')
+      res.sendStatus(500)
+    } else {
+      console.log(movies);
+      frenchMovies = movies;
+      res.render('movies', { movies: frenchMovies, title: title })
+    }
+  })
+
 })
 
 app.post('/movies', upload.fields([]), (req, res) => {
@@ -75,9 +63,17 @@ app.post('/movies', upload.fields([]), (req, res) => {
   } else {
     const formData = req.body
     console.log('formData: ', formData)
-    const newMovies = { title : req.body.movieTitle, year: req.body.movieYear}
-    frenchMovies = [...frenchMovies, newMovies]
-    res.sendStatus(201)
+    const title = req.body.movieTitle
+    const year = req.body.movieYear
+    const myMovie = new Movie({ movieTitle: title, movieYear: year})
+    myMovie.save((err, savedMovie) => {
+      if (err) {
+        console.error(err)
+      } else {
+        console.log(savedMovie)
+        res.sendStatus(201)
+      }
+    })
   }
 })
 app.get('/movies/add', (req, res) => {
