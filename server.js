@@ -50,7 +50,7 @@ app.get('/movies-search', (req, res) => {
   res.render('movies-search')
 })
 app.get('/login', (req, res) => {
-  res.render('login', { title: 'Connexion'})
+  res.render('login', { title: 'Espace Membre'})
 })
 app.post('/login', urlencodedParser, (req, res) => {
   console.log('login post', req.body)
