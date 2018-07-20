@@ -140,6 +140,12 @@ app.put('/movies-details/:id', urlencodedParser, (req, res) => {
     res.redirect('/movies')
   })
 })
+app.delete('/movies-details/:id', (req, res) => {
+  const id = req.params.id
+  Movie.findByIdAndRemove(id, (err, movie) => {
+    res.sendStatus(202)
+  })
+})
 app.get('/', (req, res) => {
   //res.send('Hello <b>Word<b/> !!!')
   res.render('index')
