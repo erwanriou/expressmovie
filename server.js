@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken')
 const expressJwt = require('express-jwt')
 const mongoose = require('mongoose');
 const faker = require('faker');
+const methodOverride = require('method-override')
 
 const config = require('./config');
 
@@ -31,6 +32,7 @@ let frenchMovies = []
 
 //middlewares
 app.use('/public', express.static('public'))
+app.use(methodOverride('_method'))
 const urlencodedParser = bodyParser.urlencoded({ extended: false })
 const upload = multer()
 const fakeUser = { email: 'testuser@testemail.fr', password: 'qwe'}
@@ -43,7 +45,8 @@ app.use(
         '/login',
         '/movies',
         '/movies-search',
-        new RegExp('/movies.*/', 'i'),]
+        new RegExp('/movies.*/', 'i'),
+        new RegExp('/movies-details.*/', 'i'),]
       }
     )
   )
@@ -112,9 +115,15 @@ app.post('/login', urlencodedParser, (req, res) => {
 })
 app.get('/movies/:id', (req, res) => {
   const id = req.params.id
-  res.render('movies-details', { movieId: id })
+  res.render('/movies-details', { movieId: id })
 })
-app.put('/movies/:id', urlencodedParser, (req, res) => {
+app.get('/movies-details/:id', (req, res) => {
+  const id = req.params.id
+  Movie.findById(id, (err, movie) => {
+    res.render('movies-details', { movie: movie })
+  })
+})
+app.put('/movies-details/:id', urlencodedParser, (req, res) => {
   const id = req.params.id
   if (!req.body) {
     return res.sendStatus(500)
@@ -128,6 +137,7 @@ app.put('/movies/:id', urlencodedParser, (req, res) => {
       console.error(err)
       return res.send('le film n\'a pas pu etre mis a jour')
     }
+    res.redirect('/movies')
   })
 })
 app.get('/', (req, res) => {
